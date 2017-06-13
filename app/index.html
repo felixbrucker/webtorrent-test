@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>test</title>
+    <script src="https://cdn.jsdelivr.net/webtorrent/latest/webtorrent.min.js"></script>
+</head>
+<body>
+<div class="log"></div>
+<script>
+  var client = new WebTorrent();
+  var magnetURI = '';
+  client.add(magnetURI, function (torrent) {
+    // Got torrent metadata!
+    console.log('Client is downloading:', torrent.infoHash);
+    const interval = setInterval(function () {
+      document.querySelector('.log').innerHTML='';
+      document.querySelector('.log').appendChild(createP('Progress: ' + (torrent.progress * 100).toFixed(1) + '%'));
+      document.querySelector('.log').appendChild(createP('Download: ' + (torrent.downloadSpeed / 1000000).toFixed(2) + 'MB/s'));
+      document.querySelector('.log').appendChild(createP('Upload: ' + (torrent.uploadSpeed / 1000000).toFixed(2) + 'MB/s'));
+      document.querySelector('.log').appendChild(createP('Peers: ' + torrent.numPeers));
+    }, 1000);
+
+    torrent.on('done', function () {
+      console.log('Progress: 100%');
+    });
+    torrent.files.forEach(function (file) {
+      console.log(file.name);
+      // Display the file by appending it to the DOM. Supports video, audio, images, and
+      // more. Specify a container element (CSS selector or reference to DOM node).
+      if (file.name.endsWith('.mp4')) {
+        file.appendTo('body');
+      }
+    })
+  });
+  function createP(content) {
+    const p = document.createElement('p');
+    p.innerHTML = content;
+    return p;
+  }
+
+</script>
+</body>
+</html>
